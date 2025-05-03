@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 from itertools import combinations
 
+=======
+from cli import parse_and_cnf, extractClauses
+>>>>>>> ec3315028872dde92944e8e2931ba703d81b335b
 class belief:
     def __init__(self, b, prio=0):
         self.b = b
@@ -68,8 +72,24 @@ class belief_base:
             
     
     def contract(self, form):
-        # her skal vi fjerne de formulas som contradicter form
-        return 
+
+        # form is a string (like from input), we convert and negate it
+        negated_form = parse_and_cnf(form, neg=True)
+        query_clauses = extractClauses(negated_form)
+
+        new_beliefs = []
+        for b in self.beliefs:
+            # Build a temporary list of all beliefs *except* b
+            kb_clauses = []
+            for other in self.beliefs:
+                if other != b:
+                    kb_clauses.extend(other.b)
+            # If that set of clauses does NOT entail the negated form, keep b
+            if not CNFResolution(kb_clauses, query_clauses):
+                new_beliefs.append(b)
+
+        self.beliefs = new_beliefs
+        return
     
     def CNFResolution(self, clauses):
         """
