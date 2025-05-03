@@ -62,7 +62,7 @@ def revision():
         #check for contradiction by seeing if negated belief is entailed
         elif BB.entails(b):
             print("Belief contradicts BB")
-            #todo: handle contradiction
+            BB.contract(b)
             BB.add_belief(b)
             print("Belief added to BB")
             return

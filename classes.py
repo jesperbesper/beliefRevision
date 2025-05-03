@@ -1,13 +1,9 @@
-<<<<<<< HEAD
-from itertools import combinations
+from itertools import chain, combinations
 
-=======
-from cli import parse_and_cnf, extractClauses
->>>>>>> ec3315028872dde92944e8e2931ba703d81b335b
 class belief:
-    def __init__(self, b, prio=0):
+    def __init__(self, b):
         self.b = b
-        self.prio = prio
+        self.prio = 0
 
     def __eq__(self, other):
         return self.b == other.b
@@ -18,12 +14,8 @@ class belief:
     def __repr__(self):
         return f"belief({repr(self.b)})" 
     
-    def setPrio(self, prio):
-        if not isinstance(prio, int) and prio < 0 and prio >= 10:
-            raise TypeError("Priority must be an integer between 0 and 10")
-        self.prio = prio
-        return
-    
+    def incrementPrio(self):
+        return self.prio + 1
 class belief_base:
     def __init__(self):
         self.beliefs = list()
@@ -44,6 +36,11 @@ class belief_base:
             raise TypeError("Expected a belief instance")
         
         self.beliefs.append(form)
+        return
+    
+    def increment_prio(self):
+        for b in self.beliefs:
+            b.prio = b.incrementPrio()
         return
     
     def print(self):
@@ -72,23 +69,31 @@ class belief_base:
             
     
     def contract(self, form):
-
-        # form is a string (like from input), we convert and negate it
-        negated_form = parse_and_cnf(form, neg=True)
-        query_clauses = extractClauses(negated_form)
-
-        new_beliefs = []
-        for b in self.beliefs:
-            # Build a temporary list of all beliefs *except* b
+        """
+        Remove any beliefs that contradict the given formula, retaining the maximal subset of consistent beliefs.
+        :param form: The belief to contract against (in CNF form).
+        """
+        def is_consistent(belief_subset):
+            """
+            Check if a subset of beliefs is consistent with the given formula.
+            """
             kb_clauses = []
-            for other in self.beliefs:
-                if other != b:
-                    kb_clauses.extend(other.b)
-            # If that set of clauses does NOT entail the negated form, keep b
-            if not CNFResolution(kb_clauses, query_clauses):
-                new_beliefs.append(b)
+            for belief in belief_subset:
+                kb_clauses.extend(belief.b)
+            kb_clauses.extend(form.b)
+            return not self.CNFResolution(kb_clauses)
 
-        self.beliefs = new_beliefs
+        # Generate all subsets of the belief base
+        all_subsets = chain.from_iterable(combinations(self.beliefs, r) for r in range(len(self.beliefs) + 1))
+
+        # Find the largest consistent subset
+        maximal_subset = []
+        for subset in all_subsets:
+            if is_consistent(subset) and len(subset) > len(maximal_subset):
+                maximal_subset = subset
+
+        # Update the belief base with the maximal consistent subset
+        self.beliefs = list(maximal_subset)
         return
     
     def CNFResolution(self, clauses):
