@@ -63,11 +63,13 @@ def revision():
         elif BB.entails(b):
             print("Belief contradicts BB")
             BB.contract(b)
+            BB.increment_prio()
             BB.add_belief(b)
             print("Belief added to BB")
             return
         else:
             print("Belief added to BB")
+            BB.increment_prio()
             BB.add_belief(b)
             return        
     except Exception as e:
