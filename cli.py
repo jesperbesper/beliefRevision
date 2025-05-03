@@ -47,20 +47,29 @@ def revision():
     print('\nEnter a belief (Valid symbols: ~, &, |, >>, <->)')
     inp_str = input(PROMT)
     form = parse_and_cnf(inp_str)
+    negForm = parse_and_cnf(inp_str, neg=True)
     try:
         clauses = extractClauses(form)
+        negClauses = extractClauses(negForm)
         print(clauses)
-        print(belief(parse_and_cnf(inp_str,neg=True)))
+        print(negClauses)
         b = belief(clauses)
-        if BB.entails(b):
+        notB = belief(negClauses)
+        #check if belif is entailed in BB by cnf res on negated
+        if BB.entails(notB):
             print("Belief already in BB")
             return
-        elif BB.entails(belief(extractClauses(parse_and_cnf(inp_str, neg=True)))):
+        #check for contradiction by seeing if negated belief is entailed
+        elif BB.entails(b):
             print("Belief contradicts BB")
             #todo: handle contradiction
             BB.add_belief(b)
             print("Belief added to BB")
             return
+        else:
+            print("Belief added to BB")
+            BB.add_belief(b)
+            return        
     except Exception as e:
         print(f'Invalid input: {e}')
         revision()

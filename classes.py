@@ -58,10 +58,23 @@ class belief_base:
         if not isinstance(form, belief):
             raise TypeError("Expected a belief instance")
         
-        for b in self.beliefs:
-            if b == form:
-                return True
+        clauses = list()
+        if len(self.beliefs) == 0:
+            return False
+        for CNFFormula in self.beliefs:
+            clauses.extend(CNFFormula.b)
+        
+        clauses.extend(form.b)
+                
+        print(clauses, 'here')
+        self.CNFResolution(clauses)
         return False
+            
     
     def contract(self, form):
         # her skal vi fjerne de formulas som contradicter form
+        return 
+    
+    def CNFResolution(self, clauses):
+        # her skal vi lave CNF resolution
+        return
