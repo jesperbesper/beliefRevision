@@ -57,8 +57,10 @@ def revision():
             return
         elif BB.entails(belief(extractClauses(parse_and_cnf(inp_str, neg=True)))):
             print("Belief contradicts BB")
+            #todo: handle contradiction
+            BB.add_belief(b)
+            print("Belief added to BB")
             return
-        BB.add_belief(b)
     except Exception as e:
         print(f'Invalid input: {e}')
         revision()

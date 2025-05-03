@@ -53,6 +53,8 @@ class belief_base:
         return
     
     def entails(self, form):
+        #entails skal lave CNF resolution og hvis man får [] så true ellers false
+        # #
         if not isinstance(form, belief):
             raise TypeError("Expected a belief instance")
         
@@ -60,3 +62,6 @@ class belief_base:
             if b == form:
                 return True
         return False
+    
+    def contract(self, form):
+        # her skal vi fjerne de formulas som contradicter form
