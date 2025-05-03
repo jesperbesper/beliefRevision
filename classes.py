@@ -1,3 +1,5 @@
+from itertools import combinations
+
 class belief:
     def __init__(self, b, prio=0):
         self.b = b
@@ -21,12 +23,6 @@ class belief:
 class belief_base:
     def __init__(self):
         self.beliefs = list()
-
-    def __iter__(self):
-        return iter(self.beliefs)
-    
-    def __len__(self):
-        return len(self.beliefs)
     
     def clear(self):
         self.beliefs = list()
@@ -67,8 +63,8 @@ class belief_base:
         clauses.extend(form.b)
                 
         print(clauses, 'here')
-        self.CNFResolution(clauses)
-        return False
+        
+        return self.CNFResolution(clauses)
             
     
     def contract(self, form):
@@ -76,5 +72,45 @@ class belief_base:
         return 
     
     def CNFResolution(self, clauses):
-        # her skal vi lave CNF resolution
-        return
+        """
+        Perform the CNF resolution algorithm to check if the clauses entail a contradiction.
+        :param clauses: List of clauses (each clause is a list of literals).
+        :return: True if a contradiction (empty clause) is found, False otherwise.
+        """
+        new = set()
+        clauses = [frozenset(clause) for clause in clauses]  # Convert clauses to frozensets for immutability
+        clauses_set = set(clauses)
+
+        while True:
+            # Generate all pairs of clauses
+            pairs = combinations(clauses_set, 2)
+
+            for (ci, cj) in pairs:
+                resolvent = self.resolve(ci, cj)
+                print(f"Resolving {ci} and {cj} to get {resolvent}")
+                if frozenset() in resolvent:  # Check for empty clause
+                    print("Contradiction found: Empty clause derived")
+                    return True
+                new.update(resolvent)
+
+            # If no new clauses are generated, stop
+            if new.issubset(clauses_set):
+                print("No contradiction found")
+                return False
+
+            # Add new clauses to the set of clauses
+            clauses_set.update(new)
+
+    def resolve(self, ci, cj):
+        """
+        Resolve two clauses to produce resolvents.
+        :param ci: Clause 1 (frozenset of literals).
+        :param cj: Clause 2 (frozenset of literals).
+        :return: Set of resolvent clauses.
+        """
+        resolvents = set()
+        for literal in ci:
+            if ~literal in cj:  # Check for complementary literals
+                resolvent = (ci - {literal}) | (cj - {~literal})
+                resolvents.add(frozenset(resolvent))
+        return resolvents
