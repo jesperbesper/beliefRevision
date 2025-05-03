@@ -1,13 +1,26 @@
 class belief:
-    def __init__(self, b):
+    def __init__(self, b, prio=0):
         self.b = b
+        self.prio = prio
 
     def __eq__(self, other):
         return self.b == other.b
     
+    def __str__(self):
+        return str(self.b) 
+    
+    def __repr__(self):
+        return f"belief({repr(self.b)})" 
+    
+    def setPrio(self, prio):
+        if not isinstance(prio, int) and prio < 0 and prio >= 10:
+            raise TypeError("Priority must be an integer between 0 and 10")
+        self.prio = prio
+        return
+    
 class belief_base:
     def __init__(self):
-        self.beliefs = set()
+        self.beliefs = list()
 
     def __iter__(self):
         return iter(self.beliefs)
@@ -16,12 +29,12 @@ class belief_base:
         return len(self.beliefs)
     
     def clear(self):
-        self.beliefs = []
+        self.beliefs = list()
 
 
     def del_formula(self, form):
         for b in self.beliefs:
-            if b.b == form:
+            if b == form:
                 self.beliefs.remove(b)
                 return
         return
@@ -30,8 +43,20 @@ class belief_base:
         if not isinstance(form, belief):
             raise TypeError("Expected a belief instance")
         
-        form = form.b
-        form = cnf(form)
-        self.del_formula(form)
- 
-        self.beliefs.append(belief(form))
+        self.beliefs.append(form)
+        return
+    
+    def print(self):
+        print("Belief Base:")
+        for b in self.beliefs:
+            print(b)
+        return
+    
+    def entails(self, form):
+        if not isinstance(form, belief):
+            raise TypeError("Expected a belief instance")
+        
+        for b in self.beliefs:
+            if b == form:
+                return True
+        return False
