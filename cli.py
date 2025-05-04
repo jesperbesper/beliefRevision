@@ -51,8 +51,6 @@ def revision():
     try:
         clauses = extractClauses(form)
         negClauses = extractClauses(negForm)
-        print(clauses)
-        print(negClauses)
         b = belief(clauses)
         notB = belief(negClauses)
         #check if belif is entailed in BB by cnf res on negated
@@ -65,10 +63,10 @@ def revision():
             BB.contract(b)
             BB.increment_prio()
             BB.add_belief(b)
-            print("Belief added to BB")
+            print(f"Belief {b} added to BB")
             return
         else:
-            print("Belief added to BB")
+            print(f"Belief {b} added to BB")
             BB.increment_prio()
             BB.add_belief(b)
             return        

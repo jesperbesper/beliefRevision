@@ -63,7 +63,7 @@ class belief_base:
         
         clauses.extend(form.b)
                 
-        print(clauses, 'here')
+        # print(clauses, 'here')
         
         return self.CNFResolution(clauses)
             
@@ -112,15 +112,15 @@ class belief_base:
 
             for (ci, cj) in pairs:
                 resolvent = self.resolve(ci, cj)
-                print(f"Resolving {ci} and {cj} to get {resolvent}")
+                # print(f"Resolving {ci} and {cj} to get {resolvent}")
                 if frozenset() in resolvent:  # Check for empty clause
-                    print("Contradiction found: Empty clause derived")
+                    # print("Contradiction found: Empty clause derived")
                     return True
                 new.update(resolvent)
 
             # If no new clauses are generated, stop
             if new.issubset(clauses_set):
-                print("No contradiction found")
+                # print("No contradiction found")
                 return False
 
             # Add new clauses to the set of clauses
