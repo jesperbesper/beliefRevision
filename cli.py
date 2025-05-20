@@ -25,6 +25,7 @@ def printHelper():
 c: Clear BB
 v: View BB
 h: Help
+cnf: Sentence to CNF
 q: Quit""")
     
 def extractClauses(formula, clauses=None):
@@ -52,6 +53,7 @@ def revision():
         clauses = extractClauses(form)
         negClauses = extractClauses(negForm)
         b = belief(clauses)
+        print(f"Belief: {b}")
         notB = belief(negClauses)
         #check if belif is entailed in BB by cnf res on negated
         if BB.entails(notB):
@@ -96,6 +98,10 @@ def get_input():
         elif inp == 'r':
             #handle revison
             revision()
+        elif inp == 'cnf':
+            print('\nEnter a belief (Valid symbols: ~, &, |, >>, <->)')
+            inp_str = input(PROMT)
+            print(parse_and_cnf(inp_str))
         else:
             print("Please enter valid input:")
 
